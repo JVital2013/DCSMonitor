@@ -1,0 +1,18 @@
+[Unit]
+Description=DCS Data Watcher Service
+After=network.target
+
+[Service]
+Type=simple
+User=dcs
+Group=dcs
+WorkingDirectory=/opt/dcs
+ExecStart=/usr/bin/python3 /opt/dcs/DCSWatcher.py
+Restart=always
+RestartSec=10
+StandardOutput=syslog
+StandardError=syslog
+SyslogIdentifier=dcs-watcher
+
+[Install]
+WantedBy=multi-user.target 
