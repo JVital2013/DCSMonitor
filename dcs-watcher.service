@@ -4,8 +4,6 @@ After=network.target
 
 [Service]
 Type=simple
-User=dcs
-Group=dcs
 WorkingDirectory=/opt/dcs
 ExecStart=/usr/bin/python3 /opt/dcs/DCSWatcher.py
 Restart=always
