@@ -1,8 +1,8 @@
 # DCS Monitor
 
-DCS Monitor is a collection of python scripts that take GOES-R DCS data processed by SatDump, and stores it in an InfluxDB database for easy visualization with Grafana.
+DCS Monitor is a collection of Python scripts that take GOES-R DCS data processed by SatDump, and stores it in an InfluxDB database for easy visualization with Grafana.
 
-IMAGE HERE
+![image](https://github.com/user-attachments/assets/b3c42bd1-2c88-435d-a426-6156e45b77d0)
 
 ## Setup instructions
 
@@ -18,15 +18,15 @@ Setup can be broken down into 5 steps:
 
 First, you need to install SatDump and configure it to parse DCS data from GOES-R HRIT. If you are using the GUI, check "Parse DCS". If you're using the command line, add `--parse_dcs` to the command line options.
 
-IMAGE HERE
+![image](https://github.com/user-attachments/assets/988e1e8c-462c-4fac-ba9d-c40ab936213d)
 
 There are tens of thousands of Data Collection Platforms (DCPs) around the world. To avoid processing too much data, it is highly recommended that you filter DCS messages to those you are interested in. If you are in the United States or Canada, go to [https://hads.ncep.noaa.gov/maps/](https://hads.ncep.noaa.gov/maps/) and find DCPs near you.
 
-IMAGE HERE
+![image](https://github.com/user-attachments/assets/8baf8a06-467e-46a2-aaa0-6f5608260ea2)
 
 The NESDIS ID is the address used on the GOES downlink. Create a comma-seperated list of all DCPs you are interested in, and specify them in the SatDump UI as shown above, or by the `--tracked_addresses` command line parameter. Once you start decoding, you should get a DCS folder in your output directory that contains json files. If you're only tracking a few addresses, it may take several hours for data to appear.
 
-IMAGE HERE
+![image](https://github.com/user-attachments/assets/39fe6ae4-a181-4b0d-99aa-a06f6baf397c)
 
 ### Install Docker
 
@@ -41,21 +41,21 @@ sudo mkdir /var/lib/influxdb2
 sudo docker run -d -p 8086:8086 --name influxdb -v /var/lib/influxdb2:/var/lib/influxdb2 influxdb:latest
 ```
 
-Once the container starts, go to http://<ip-of-docker-host>:8086/ in your web browser. Follow the setup steps, then do quickstart to get started. Now, let's set up a bucket to store the data, along with an API key. On the left, choose Load Data > Buckets, then choose Create Bucket.
+Once the container starts, go to http://\<ip-of-docker-host\>:8086/ in your web browser. Follow the setup steps, then do quickstart to get started. Take note of the Org Name you use for later. Now, let's set up a bucket to store the data, along with an API key. On the left, choose Load Data > Buckets, then choose Create Bucket.
 
-IMAGE HERE
+![image](https://github.com/user-attachments/assets/1806fe97-fcbd-4ea0-9484-b4c136d64d96)
 
 Give it a name like `dcs_data`, and set the retention policy as you like. I recommend "never".
 
-IMAGE HERE
+![image](https://github.com/user-attachments/assets/d00fd381-3a8d-4af4-af9d-11682a813223)
 
 Next, go to Load Data > API Tokens on the left. Select "Generate API token", followed by "Custom API Token"
 
-IMAGE HERE
+![image](https://github.com/user-attachments/assets/a7bff740-8e07-4e5a-b672-a80e015ca5a0)
 
 Give your new token a name, then check both "Read" and "Write" next to the bucket you created. Finally, click "Generate"
 
-IMAGE HERE
+![image](https://github.com/user-attachments/assets/5b6cd92c-bdb5-4018-87bf-d7c9ffe619ff)
 
 You will be shown your API token. Copy the token and keep it somewhere safe for now.
 
@@ -70,21 +70,21 @@ sudo mkdir /var/lib/grafana/certs
 sudo docker run -d -p 3000:3000 --name grafana --user root -v /var/lib/grafana/data:/var/lib/grafana -v /var/lib/grafana/certs:/certs grafana/grafana-oss
 ```
 
-Once the container starts, go to http://<ip-of-docker-host>:3000/ and log in with the default admin:admin credentials. Next, go to Connections > Add new connection on the left, and add a new InfluxDB data source.
+Once the container starts, go to http://\<ip-of-docker-host\>:3000/ and log in with the default admin:admin credentials, which you will be prompted to change. Next, go to Connections > Add new connection on the left, and add a new InfluxDB data source.
 
-IMAGE HERE
+![image](https://github.com/user-attachments/assets/52d6d34e-045f-4979-bb29-1ec21d074d2a)
 
 Configure the connection as follows:
 
  - Query Language: InfluxQL
- - URL: http://<ip-of-docker-host>:8086/
+ - URL: http://\<ip-of-docker-host\>:8086/
  - Database: The bucket name set up under InfluxDB; usually dcs_data
  - User: The API token created for the DCS data bucket
  - Password: The API token created for the DCS data bucket
 
 Click Save and Test. If everything is working, you'll get a success message.
 
-IMAGE HERE
+![image](https://github.com/user-attachments/assets/c9b955ff-f4b8-49ca-94d7-96a1eb47dfc4)
 
 ### Configure DCS Monitor
 
@@ -115,19 +115,17 @@ After this, you can delete the folder you cloned from git. The service will oper
 
 ## Building Grafana Dashboards
 
-Congrats! You are now logging DCS data to InfluxDB. Now, let's make a dashboard in Grafana to display your data. Go back to http://<ip-of-docker-host>:3000/ and go to Dashboards on the left. Create a new dashboard.
+Congrats! You are now logging DCS data to InfluxDB. Now, let's make a dashboard in Grafana to display your data. Go back to http://\<ip-of-docker-host\>:3000/ and go to Dashboards on the left. Create a new dashboard.
 
-IMAGE HERE
+![image](https://github.com/user-attachments/assets/f64d4db0-0071-4bf2-8726-3c540c2b19f4)
 
-Click "Add Visualization"
+Click "Add Visualization," and the InfluxDB data source you configured when setting up Grafana.
 
-Select the InfluxDB data source you configured when setting up Grafana
-
-IMAGE HERE
+![image](https://github.com/user-attachments/assets/96de6f09-20dc-479c-868a-7cd999f58c67)
 
 At the bottom, click the pencil to allow creating custom queries
 
-IMAGE HERE
+![image](https://github.com/user-attachments/assets/02059ec9-df40-4f8a-b926-5189e843c88e)
 
 From here, the sky's the limit. Below are some sample queries that can display different types of DCS data.
 
